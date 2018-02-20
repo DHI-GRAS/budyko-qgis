@@ -1,10 +1,10 @@
 ##Budyko=group
 ##Budyko Hydrological Model=name
-##ParameterFile|GEOMETRY_FILE|Geometry setup
-##ParameterFile|MODEL_FILE|Model setup
-##ParameterFile|OBS_REACH_FILE|Observed-discharge file|False|True
+##ParameterFile|GEOMETRY_FILE|Geometry setup|False|False
+##ParameterFile|MODEL_FILE|Model setup|False|False
+##ParameterFile|OBS_REACH_FILE|Observed-discharge file|False|False
 ##ParameterFile|PARAMETER_FILE|Model parameter file|False|True
-##ParameterNumber|REACH_NUMBER|Reach number considered|0
+##ParameterNumber|REACH_NUMBER|Reach number considered|0|10000|0
 ##ParameterString|STARTDATE|Start date YYYYJJJ|
 ##ParameterSelection|OUTPUT_TYPE|Output type|Hydrograph;Climatology;FDC|0
 ##OutputDirectory|OUTDIR|Output directory for plots
@@ -15,6 +15,7 @@
 from budyko_model.scripts import middle_layer
 
 middle_layer.main(
+    geometry_file=GEOMETRY_FILE,
     model_file=MODEL_FILE,
     parameter_file=PARAMETER_FILE,
     obs_reach_file=OBS_REACH_FILE,
