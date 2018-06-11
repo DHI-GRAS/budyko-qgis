@@ -6,11 +6,11 @@
 ##ParameterFile|PARAMETER_FILE|Model parameter file|False|True
 ##ParameterNumber|REACH_NUMBER|Reach number considered|0|10000|0
 ##ParameterString|STARTDATE|Start date YYYYJJJ|
-##ParameterSelection|OUTPUT_TYPE|Output type|Hydrograph;Climatology;FDC|0
+##ParameterSelection|MODEL_TYPE_ID|Output type|Hydrograph;Climatology;FDC|0
 ##OutputDirectory|OUTDIR|Output directory for plots
-##ParameterSelection|TIME_STAMP|Time resolution|daily;monthly|0
+##ParameterSelection|TIME_RESOLUTION_ID|Time resolution|daily;monthly|0
 ##*ParameterNumber|N_CLASSES|Number of volume classes for FDC|0|1000|20
-##*ParameterString|TITLE|Title for plot|||True
+##*ParameterString|FIGURE_TITLE|Title for plot|||True
 import sys
 from contextlib import contextmanager
 
@@ -36,6 +36,9 @@ def redirect_stdout(progress):
         sys.stdout = oldout
 
 
+time_resolution = ['daily', 'monthly'][TIME_RESOLUTION_ID]
+model_type = ['hydrograph', 'climatology', 'fdc'][MODEL_TYPE_ID]
+
 with redirect_stdout(progress):
     middle_layer.main(
         geometry_file=GEOMETRY_FILE,
@@ -45,7 +48,8 @@ with redirect_stdout(progress):
         outdir=OUTDIR,
         reach_number=REACH_NUMBER,
         startdate=STARTDATE,
-        output_type=OUTPUT_TYPE,
-        time_stamp=TIME_STAMP,
+        model_type=model_type,
+        time_resolution=time_resolution,
         n_classes=N_CLASSES,
-        title=TITLE)
+        figure_title=FIGURE_TITLE,
+        show_figure=True)
