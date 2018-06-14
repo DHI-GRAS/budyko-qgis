@@ -43,7 +43,7 @@ with redirect_stdout(progress):
     middle_layer.main(
         geometry_file=GEOMETRY_FILE,
         model_file=MODEL_FILE,
-        parameter_file=PARAMETER_FILE,
+        parameter_file=(PARAMETER_FILE or None),
         obs_reach_file=OBS_REACH_FILE,
         outdir=OUTDIR,
         reach_number=REACH_NUMBER,
