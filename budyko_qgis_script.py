@@ -10,6 +10,7 @@
 ##OutputDirectory|OUTDIR|Output directory for plots
 ##ParameterSelection|TIME_RESOLUTION_ID|Time resolution|daily;monthly|0
 ##*ParameterNumber|N_CLASSES|Number of volume classes for FDC|0|1000|20
+##*ParameterNumber|AREA_TO_M|Factor to convert area to meters|0|1000000|1.0
 ##*ParameterString|FIGURE_TITLE|Title for plot|||True
 import sys
 from contextlib import contextmanager
@@ -51,5 +52,6 @@ with redirect_stdout(progress):
         model_type=model_type,
         time_resolution=time_resolution,
         n_classes=N_CLASSES,
+        area_to_m=AREA_TO_M,
         figure_title=FIGURE_TITLE,
         show_figure=True)
