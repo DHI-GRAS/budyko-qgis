@@ -106,12 +106,14 @@ with open(os.path.join(model.Path, "log.txt"), "w") as log_file:
         # Get new array
         pcp_startdate = last_pcp_date + timedelta(days=1)
         new_pcp_juliandates, new_pcp_array = \
-            ZonalStats(pcp_startdate, new_pcp_enddate, model.Path, model.desc['ModelName'],
+            ZonalStats(pcp_startdate, new_pcp_enddate,
                        os.path.join(model.Path, model.desc['Shapefile']),
-                       model.desc['SubbasinColumn'], subcatchmap_res, new_pcp_files, log_file,
-                       None, correct_factor)
+                       model.desc['SubbasinColumn'], new_pcp_files, subcatchmap_res, None,
+                       correct_factor, progress)
         # Combine arrays
         pcp_juliandates = numpy.concatenate((pcp_juliandates, new_pcp_juliandates), axis=0)
+        progress.setConsoleInfo(str(pcp_array.shape))
+        progress.setConsoleInfo(str(new_pcp_array.shape))
         pcp_array = numpy.concatenate((pcp_array, new_pcp_array), axis=0)
         progress.setConsoleInfo("Writing new precipitation files...")
         # Write files
@@ -127,20 +129,20 @@ with open(os.path.join(model.Path, "log.txt"), "w") as log_file:
             correct_number = None
         tmp_startdate = last_tmp_date + timedelta(days=1)
         new_tmax_juliandates, new_tmp_max_array = \
-            ZonalStats(tmp_startdate, new_tmax_enddate, model.Path, model.desc['ModelName'],
+            ZonalStats(tmp_startdate, new_tmax_enddate,
                        os.path.join(model.Path, model.desc['Shapefile']),
-                       model.desc['SubbasinColumn'], subcatchmap_res, new_tmax_files, log_file,
-                       correct_number, None)
+                       model.desc['SubbasinColumn'], new_tmax_files, subcatchmap_res,
+                       correct_number, None, progress)
         # TMIN
         if tmin_var_ECMWF in new_tmin_files[0]:
             correct_number = -273.15
         else:
             correct_number = None
         new_tmin_juliandates, new_tmp_min_array = \
-            ZonalStats(tmp_startdate, new_tmin_enddate, model.Path, model.desc['ModelName'],
+            ZonalStats(tmp_startdate, new_tmin_enddate,
                        os.path.join(model.Path, model.desc['Shapefile']),
-                       model.desc['SubbasinColumn'], subcatchmap_res, new_tmin_files, log_file,
-                       correct_number, None)
+                       model.desc['SubbasinColumn'], new_tmin_files, subcatchmap_res,
+                       correct_number, None, progress)
 
         # Make sure tmax and tmin have same end days
         dif = (len(new_tmax_juliandates)-len(new_tmin_juliandates))
