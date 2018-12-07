@@ -112,8 +112,6 @@ with open(os.path.join(model.Path, "log.txt"), "w") as log_file:
                        correct_factor, progress)
         # Combine arrays
         pcp_juliandates = numpy.concatenate((pcp_juliandates, new_pcp_juliandates), axis=0)
-        progress.setConsoleInfo(str(pcp_array.shape))
-        progress.setConsoleInfo(str(new_pcp_array.shape))
         pcp_array = numpy.concatenate((pcp_array, new_pcp_array), axis=0)
         progress.setConsoleInfo("Writing new precipitation files...")
         # Write files

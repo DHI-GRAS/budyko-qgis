@@ -43,16 +43,25 @@ def ZonalStats(start_date, end_date, vec_name, sb_column, file_list, subcatchmap
             raise IOError('Datafiles must be in geographic WGS 1984 projection')
         resolution = raster.rasterUnitsPerPixelX()
 
-        # Resample raster to given resolution and normalize so that rainfall sums will be the
-        # same as before
+        # Resample raster to given resolution
         temp_rast_name = system.getTempFilename("tif")
         warp_params = {"INPUT": file_name, "OUTPUT": temp_rast_name, "DEST_SRS": "EPSG:4326",
                        "METHOD": 0, "TR": subcatchmap_res, "USE_RASTER_EXTENT": True,
                        "RASTER_EXTENT": dataobjects.extent([layer]), "EXTENT_CRS": "EPSG:4326"}
         processing.runalg("gdalogr:warpreproject", warp_params)
         out_rast_name = system.getTempFilename("tif")
+
+        # Apply correction factors if given and normalize resampled data so that sums in a given
+        # zone are the same as in original raster
+        normalization_factor = resolution**2/float(subcatchmap_res)**2
+        if corr_by_num is not None:
+            formula = "(A+%f)/%f" % (corr_by_num, normalization_factor)
+        elif corr_by_fact is not None:
+            formula = "(A*%f)/%f" % (corr_by_fact, normalization_factor)
+        else:
+            formula = "A/%f" % (normalization_factor)
         calculator_params = {"INPUT_A": temp_rast_name, "OUTPUT": out_rast_name,
-                             "FORMULA": "A/%f" % (resolution**2/float(subcatchmap_res)**2)}
+                             "FORMULA": formula}
         processing.runalg("gdalogr:rastercalculator", calculator_params)
 
         # Run zonal stats
@@ -68,10 +77,6 @@ def ZonalStats(start_date, end_date, vec_name, sb_column, file_list, subcatchmap
             subbasin_id = feature[sb_column]
             subbasin_value = feature["stats_sum"]
             try:
-                if corr_by_num is not None:
-                    subbasin_value = subbasin_value + corr_by_num * feature["stats_coun"]
-                elif corr_by_fact is not None:
-                    subbasin_value = subbasin_value * corr_by_fact
                 result_ts[ind, subbasin_id-1] = subbasin_value
             except TypeError:
                 result_ts[ind, subbasin_id-1] = -99.0
