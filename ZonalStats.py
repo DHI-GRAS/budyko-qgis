@@ -37,32 +37,31 @@ def ZonalStats(start_date, end_date, vec_name, sb_column, file_list, subcatchmap
         if progress is not None:
             progress.setConsoleInfo("Processing %s..." % file_name)
 
-        # Check the raster projection and get the resolution
+        # Check the raster projection
         raster = dataobjects.getObjectFromUri(file_name)
         if raster.crs().toProj4() != "+proj=longlat +datum=WGS84 +no_defs":
             raise IOError('Datafiles must be in geographic WGS 1984 projection')
-        resolution = raster.rasterUnitsPerPixelX()
+
+        # Apply correction factors if given
+        formula = ""
+        if corr_by_num is not None:
+            formula = "A+%f" % (corr_by_num)
+        elif corr_by_fact is not None:
+            formula = "A*%f" % (corr_by_fact)
+        if formula:
+            temp_rast_name = system.getTempFilename("tif")
+            calculator_params = {"INPUT_A": file_name, "OUTPUT": temp_rast_name,
+                                 "FORMULA": formula}
+            processing.runalg("gdalogr:rastercalculator", calculator_params)
+        else:
+            temp_rast_name = file_name
 
         # Resample raster to given resolution
-        temp_rast_name = system.getTempFilename("tif")
-        warp_params = {"INPUT": file_name, "OUTPUT": temp_rast_name, "DEST_SRS": "EPSG:4326",
-                       "METHOD": 0, "TR": subcatchmap_res, "USE_RASTER_EXTENT": True,
+        out_rast_name = system.getTempFilename("tif")
+        warp_params = {"INPUT": temp_rast_name, "OUTPUT": out_rast_name, "DEST_SRS": "EPSG:4326",
+                       "METHOD": 1, "TR": subcatchmap_res, "USE_RASTER_EXTENT": True,
                        "RASTER_EXTENT": dataobjects.extent([layer]), "EXTENT_CRS": "EPSG:4326"}
         processing.runalg("gdalogr:warpreproject", warp_params)
-        out_rast_name = system.getTempFilename("tif")
-
-        # Apply correction factors if given and normalize resampled data so that sums in a given
-        # zone are the same as in original raster
-        normalization_factor = resolution**2/float(subcatchmap_res)**2
-        if corr_by_num is not None:
-            formula = "(A+%f)/%f" % (corr_by_num, normalization_factor)
-        elif corr_by_fact is not None:
-            formula = "(A*%f)/%f" % (corr_by_fact, normalization_factor)
-        else:
-            formula = "A/%f" % (normalization_factor)
-        calculator_params = {"INPUT_A": temp_rast_name, "OUTPUT": out_rast_name,
-                             "FORMULA": formula}
-        processing.runalg("gdalogr:rastercalculator", calculator_params)
 
         # Run zonal stats
         zs_output_name = system.getTempFilename("shp")
@@ -75,7 +74,7 @@ def ZonalStats(start_date, end_date, vec_name, sb_column, file_list, subcatchmap
         zs_output = dataobjects.getObjectFromUri(zs_output_name)
         for feature in zs_output.getFeatures():
             subbasin_id = feature[sb_column]
-            subbasin_value = feature["stats_sum"]
+            subbasin_value = feature["stats_mean"]
             try:
                 result_ts[ind, subbasin_id-1] = subbasin_value
             except TypeError:
