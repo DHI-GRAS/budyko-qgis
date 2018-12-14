@@ -18,21 +18,14 @@ class ClimateStations():
             # Reading station file
             with open(stations_filename, 'r') as station_file:
                 for line in station_file.readlines()[1:]:
+                    info = line.split(",")
                     try:
-                        int(line[2:8])
-                        self.station_id.append(line[2:8])
-                        self.station_lati.append(float(line[9:15]))
-                        self.station_long.append(float(line[16:21]))
-                        self.station_elev.append(int(line[22:26]))
+                        self.station_id.append(info[1][0:6])
+                        self.station_lati.append(float(info[2][0:6]))
+                        self.station_long.append(float(info[3][0:6]))
+                        self.station_elev.append(int(info[4][0:4]))
                     except ValueError:
-                        try:
-                            int(line[3:9])
-                            self.station_id.append(line[3:9])
-                            self.station_lati.append(float(line[10:16]))
-                            self.station_long.append(float(line[17:22]))
-                            self.station_elev.append(int(line[23:27]))
-                        except ValueError:
-                            pass
+                        pass
 
             # Convert id's to dictionary
             self.station_id_dict = {}
@@ -48,7 +41,7 @@ class ClimateStations():
         # Sort id's
         station_id_sorted = sorted(self.station_id_dict)
         # Reading .pcp files to numpy array
-        pcp_array = []
+        pcp_array = None
         pcp_dates = []
         for i in station_id_sorted:
             station_pcp_filename = os.path.join(station_folder, self.station_id_dict[i] + '.txt')
@@ -56,7 +49,7 @@ class ClimateStations():
                 with open(station_pcp_filename, 'r') as pcp_file:
                     lines = pcp_file.readlines()
                     lines_number = len(lines)
-                    if not pcp_array:
+                    if pcp_array is None:
                         pcp_array = numpy.zeros([lines_number - 1, len(station_id_sorted)],
                                                 dtype=numpy.float)
                     for n in range(lines_number):
@@ -109,8 +102,8 @@ class ClimateStations():
         # Sort id's
         station_id_sorted = sorted(self.station_id_dict)
         # Reading old .tmp files to numpy array
-        tmp_max_array = []
-        tmp_min_array = []
+        tmp_max_array = None
+        tmp_min_array = None
         tmp_dates = []
         for i in station_id_sorted:
             station_tmp_filename = os.path.join(station_folder,
@@ -119,7 +112,7 @@ class ClimateStations():
                 with open(station_tmp_filename, 'r') as tmp_file:
                     lines = tmp_file.readlines()
                     lines_number = len(lines)
-                if not tmp_max_array:
+                if tmp_max_array is None:
                     tmp_max_array = numpy.zeros([lines_number-1, len(station_id_sorted)],
                                                 dtype=numpy.float)
                     tmp_min_array = numpy.zeros([lines_number-1, len(station_id_sorted)],
