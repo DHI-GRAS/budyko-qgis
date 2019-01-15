@@ -4,7 +4,8 @@
 ##Merge, reproject and subset=name
 ##ParameterMultipleInput|inputImages|Input images|3|
 ##ParameterCrs|projection|Metric coordinate system (UTM)|
-##ParameterExtent|extent|Spatial extent in target coordinate system|
+##ParameterExtent|extent|Spatial extent|
+##ParameterCrs|extentProjection|Coordinate system of the extent|EPSG:4326|False
 ##ParameterNumber|resolution|Spatial resolution in target coordinate system (leave as 0 for no change)|0.0|100000000.0|0.0|
 ##OutputRaster|outputImage|Output image
 
@@ -18,6 +19,6 @@ vrtOutput = processing.runalg("gdalogr:buildvirtualraster", params)
 
 # Run GDAL warp to reproject, resample and subset
 params = {'INPUT': vrtOutput['OUTPUT'], 'DEST_SRS': projection, 'METHOD': 5, "TR": resolution,
-          'USE_RASTER_EXTENT': True, 'RASTER_EXTENT': extent, 'NO_DATA': "-32768", 
-          "OUTPUT": outputImage}
+          'USE_RASTER_EXTENT': True, 'RASTER_EXTENT': extent, 'EXTENT_CRS': extentProjection, 
+          'NO_DATA': "-32768", "OUTPUT": outputImage}
 processing.runalg("gdalogr:warpreproject", params)
