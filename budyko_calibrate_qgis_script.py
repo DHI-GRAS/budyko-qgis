@@ -3,7 +3,7 @@
 ##ParameterFile|GEOMETRY_FILE|Geometry setup|False|False
 ##ParameterFile|MODEL_FILE|Model setup|False|False
 ##ParameterFile|OBS_REACH_FILE|Observed-discharge file|False|False
-##ParameterFile|CONFIG_FILE|Config file (JSON) for calibration|False|True
+##ParameterFile|CONFIG_FILE|Config file (JSON) for calibration|False|False
 ##ParameterString|STARTDATE|Start date YYYYJJJ|
 ##ParameterString|ENDDATE|End date YYYYJJJ|
 ##ParameterSelection|CALIBRATION_TYPE_ID|Calibration type|FDC;Climatology;both|0
