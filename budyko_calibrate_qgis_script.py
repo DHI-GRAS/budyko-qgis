@@ -3,14 +3,14 @@
 ##ParameterFile|GEOMETRY_FILE|Geometry setup|False|False
 ##ParameterFile|MODEL_FILE|Model setup|False|False
 ##ParameterFile|OBS_REACH_FILE|Observed-discharge file|False|False
-##ParameterFile|CONFIG_FILE|Config file (JSON) for calibration|False|True
+##ParameterFile|CONFIG_FILE|Config file (JSON) for calibration|False|False
 ##ParameterString|STARTDATE|Start date YYYYJJJ|
 ##ParameterString|ENDDATE|End date YYYYJJJ|
 ##ParameterSelection|CALIBRATION_TYPE_ID|Calibration type|FDC;Climatology;both|0
 ##*ParameterNumber|REP|Number of repetitions in optimization|1|1000000|100000
-##*ParameterNumber|N_CLASSES|Number of volume classes for FDC|0|1000|20
-##*ParameterNumber|ACC_INT|Parameter acc_int|0|1000|0.1
-##*ParameterNumber|Z_CH|Parameter z_ch|0|1000|2.0
+##*ParameterNumber|N_CLASSES|Number of volume classes for FDC calibration|0|1000|20
+##*ParameterNumber|ACC_INT|Accepted interval for FDC objective function|0|1|0.1
+##*ParameterNumber|Z_CH|Inverse of river channel side slope, z_ch (trapezoidal channel)|0|1000|2.0
 ##*ParameterNumber|AREA_TO_M|Factor to convert area to meters|0|1000000|1.0
 import re
 import sys
