@@ -3,7 +3,7 @@
 ##ParameterFile|dst_folder|Select precipitation folder|True|False
 ##ParameterString|start_date|Start date [yyyymmdd]. Must be after 20010101.|20130101|False
 ##ParameterString|end_date|End date [yyyymmdd]. For dates older than a year, the whole year will be downloaded.|20130101|False
-##*ParameterExtent|subset_extent|Subset to download. Leave default value to download global dataset.|0,1,0,1
+##*ParameterExtent|subset_extent|Subset to download. Leave default value to download African dataset.|0,1,0,1
 
 import os
 import sys
