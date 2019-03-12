@@ -51,7 +51,7 @@ if os.path.exists(rc):
         KEY   = config.get("key")
         EMAIL = config.get("email")
     except Exception, e:
-        print(e)
+        print(str(e))
         sys.exit(1)
 
 KEY=os.environ.get("ECMWF_API_KEY", KEY)
@@ -105,7 +105,7 @@ def robust(func):
                 if tries > 10: raise
                 time.sleep(60)
             except:
-                print("Unexpected error:", sys.exc_info()[0])
+                print("Unexpected error: %s" % sys.exc_info()[0])
                 print(traceback.format_exc())
                 raise
 
@@ -192,7 +192,7 @@ class Connection(object):
                 else:
                     raise
         except urllib2.HTTPError,e:
-            print(e)
+            print(str(e))
             error = True
             res   = e
             # 502: Proxy Error
