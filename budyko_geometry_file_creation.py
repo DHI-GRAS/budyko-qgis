@@ -45,6 +45,6 @@ with redirect_stdout(progress):
     geometry_file_creation.read_network_file(model, routing, temp_file)
     subreaches = pd.read_csv(temp_file, index_col='Subbasin')
     geometry_file_creation.write_geometry_file(subreaches=subreaches,
-                                               mode=model,
+                                               model=model,
                                                drains_to=drains_to,
                                                geometry_file=GEOMETRY_FILE)
