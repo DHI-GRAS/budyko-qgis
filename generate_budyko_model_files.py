@@ -4,6 +4,7 @@
 ##ParameterString|MODEL_NAME|Name of the model|
 ##ParameterString|MODEL_STARTDATE|Starting date of the model (YYYYMMDD)|20000101|
 ##ParameterVector|MODEL_SUBSHAPES|Model sub-basin polygon file (in lat-lon)|2|False
+##ParameterVector|MODEL_NETWORK|Model river network file (in lat-lon)|1|False
 ##*ParameterString|MODEL_SUBCOLUMN|Name of sub-basin shapefile column holding sub IDs|ID|
 ##*ParameterString|MODEL_AREACOLUMN|Name of sub-basin shapefile column holding subbasin area|area
 ##ParameterFile|MODEL_CLIMSTATS|Storage location for model climate station file|True|False
@@ -30,6 +31,7 @@ modelfile.writelines('ModelName ' + MODEL_NAME + '\r\n')
 modelfile.writelines('Type Hist\r\n')
 modelfile.writelines('ModelStartDate ' + MODEL_STARTDATE + '\r\n')
 modelfile.writelines('Shapefile ' + os.path.relpath(MODEL_SUBSHAPES, MODEL_FILEPATH) + '\r\n')
+modelfile.writelines('RiverNetwork ' + os.path.relpath(MODEL_NETWORK, MODEL_FILEPATH) + '\r\n')
 modelfile.writelines('SubbasinColumn ' + MODEL_SUBCOLUMN + '\r\n')
 modelfile.writelines('Stations ' + os.path.relpath(MODEL_CLIMSTATS, MODEL_FILEPATH) + os.sep + MODEL_NAME + 'Stations.txt' + '\r\n')
 modelfile.writelines('StationsTemp ' + os.path.relpath(MODEL_CLIMSTATS, MODEL_FILEPATH) + os.sep + MODEL_NAME + 'StationsTemp.txt' + '\r\n')
