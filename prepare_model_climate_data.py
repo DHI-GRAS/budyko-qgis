@@ -17,7 +17,7 @@ if not os.path.dirname(scriptDescriptionFile) in sys.path:
 from ClimateStations import ClimateStations
 from ZonalStats import ZonalStats
 
-progress.setConsoleInfo("Loading model and data files...")
+feedback.pushConsoleInfo("Loading model and data files...")
 
 # Check inputs
 for folder in [pcp_folder, tmax_folder, tmin_folder]:
@@ -38,12 +38,12 @@ with open(os.path.join(model.Path, "log.txt"), "w") as log_file:
     stations_temp = ClimateStations(os.path.join(model.Path, model.desc['StationsTemp']))
     stations = ClimateStations(os.path.join(model.Path, model.desc['Stations']))
 
-    progress.setConsoleInfo("Reading old climate data...")
+    feedback.pushConsoleInfo("Reading old climate data...")
     pcp_juliandates, first_pcp_date, last_pcp_date, pcp_array = stations.readPcpFiles(log_file)
     tmp_juliandates, first_tmp_date, last_tmp_date, tmp_max_array, tmp_min_array =\
         stations_temp.readTmpFiles(log_file)
 
-    progress.setConsoleInfo("Searching for new files...")
+    feedback.pushConsoleInfo("Searching for new files...")
     # Getting list of new pcp data files
     new_pcp_files = []
     new_pcp_enddate = last_pcp_date
@@ -96,7 +96,7 @@ with open(os.path.join(model.Path, "log.txt"), "w") as log_file:
     log_file.write('TMAX files: ' + str(new_tmax_files) + '\n')
     log_file.write('TMIN files: ' + str(new_tmin_files) + '\n')
 
-    progress.setConsoleInfo("Extracting precipitation data...")
+    feedback.pushConsoleInfo("Extracting precipitation data...")
     # Process new APCP files
     if new_pcp_files:
         try:
@@ -113,11 +113,11 @@ with open(os.path.join(model.Path, "log.txt"), "w") as log_file:
         # Combine arrays
         pcp_juliandates = numpy.concatenate((pcp_juliandates, new_pcp_juliandates), axis=0)
         pcp_array = numpy.concatenate((pcp_array, new_pcp_array), axis=0)
-        progress.setConsoleInfo("Writing new precipitation files...")
+        feedback.pushConsoleInfo("Writing new precipitation files...")
         # Write files
         stations.writePcpFiles(first_pcp_date, pcp_array, log_file)
 
-    progress.setConsoleInfo("Extracting temperature data...")
+    feedback.pushConsoleInfo("Extracting temperature data...")
     # Process Temperature files
     if new_tmax_files and new_tmin_files:
         # TMAX
@@ -151,7 +151,7 @@ with open(os.path.join(model.Path, "log.txt"), "w") as log_file:
             new_tmp_min_array = new_tmp_min_array[:-dif, :]
             new_tmin_juliandates = new_tmin_juliandates[:-dif, :]
 
-        progress.setConsoleInfo("Writing new temperature files...")
+        feedback.pushConsoleInfo("Writing new temperature files...")
         # Combine arrays
         # TMAX
         tmp_juliandates = numpy.concatenate((tmp_juliandates, new_tmax_juliandates), axis=0)

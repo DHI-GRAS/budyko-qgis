@@ -35,7 +35,7 @@ def ZonalStats(start_date, end_date, vec_name, sb_column, file_list, subcatchmap
         else:
             continue
         if progress is not None:
-            progress.setConsoleInfo("Processing %s..." % file_name)
+            feedback.pushConsoleInfo("Processing %s..." % file_name)
 
         # Check the raster projection
         raster = dataobjects.getObjectFromUri(file_name)

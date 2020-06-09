@@ -24,7 +24,7 @@ import processing
 
 model_description_file = os.path.join(MODEL_FILEPATH, MODEL_NAME+".txt")
 
-progress.setConsoleInfo("Writing model description file...")
+feedback.pushConsoleInfo("Writing model description file...")
 modelfile = open(model_description_file, 'w')
 modelfile.writelines('Model description file\r\n')
 modelfile.writelines('ModelName ' + MODEL_NAME + '\r\n')
@@ -45,7 +45,7 @@ modelfile.close()
 
 # Generate climate station file
 # Write station file
-progress.setConsoleInfo("Reading data from catchment vector files...")
+feedback.pushConsoleInfo("Reading data from catchment vector files...")
 model = ModelFile(model_description_file, check_for_missing_files=False)
 layer = dataobjects.getObjectFromUri(os.path.join(model.Path, model.desc['Shapefile']))
 extent = str(layer.extent().xMinimum())+","+str(layer.extent().xMaximum())+","+\
@@ -106,7 +106,7 @@ with open(area_filename, 'r') as fp:
     for line in fp.readlines()[1:]:
         area.append(float(line))
 
-progress.setConsoleInfo("Writing station files..")
+feedback.pushConsoleInfo("Writing station files..")
 with open(os.path.join(model.Path, model.desc['StationsTemp']), 'w') as stp,\
      open(os.path.join(model.Path, model.desc['Stations']), 'w') as sp:
     stp.writelines('ID,NAME,LAT,LONG,ELEVATION,AREA' + '\n')

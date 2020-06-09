@@ -26,10 +26,10 @@ def ECMWFImport(email, token, startdate, enddate, tmax_dst_folder, tmin_dst_fold
     min_startdate = datetime.strptime(('1979-01-01'), "%Y-%m-%d").date()
     if startdate < min_startdate:
         startdate = min_startdate
-        progress.setConsoleInfo("Start date corrected to: " + startdate.strftime('%Y%m%d') + "...")
+        feedback.pushConsoleInfo("Start date corrected to: " + startdate.strftime('%Y%m%d') + "...")
     if enddate > max_enddate:
         enddate = max_enddate
-        progress.setConsoleInfo("End date corrected to: " + enddate.strftime('%Y%m%d') + "...")
+        feedback.pushConsoleInfo("End date corrected to: " + enddate.strftime('%Y%m%d') + "...")
     if startdate > max_enddate:
         return
 
@@ -81,7 +81,7 @@ def ECMWFImport(email, token, startdate, enddate, tmax_dst_folder, tmin_dst_fold
 
 def GetECMWF(server, FirstYear, FirstMonth, FirstDay, LastYear, LastMonth, LastDay, LeftLon,
              RightLon, TopLat, BottomLat, dst_file, progress):
-    progress.setConsoleInfo("Sending data request to ECMWF. It might take a long time to get it " +
+    feedback.pushConsoleInfo("Sending data request to ECMWF. It might take a long time to get it " +
                             "processed, please be patient...")
     server.retrieve({
         'dataset' : "interim",
@@ -100,7 +100,7 @@ def GetECMWF(server, FirstYear, FirstMonth, FirstDay, LastYear, LastMonth, LastD
 
 
 def gdal2GeoTiff_ECMWF_WGS84(Filename, progress):
-    progress.setConsoleInfo("Translating to GeoTIFF...")
+    feedback.pushConsoleInfo("Translating to GeoTIFF...")
     tiff_filename_base = os.path.split(Filename)[0] + os.sep
     tiff_filelist = []
 
@@ -137,7 +137,7 @@ def gdal2GeoTiff_ECMWF_WGS84(Filename, progress):
 
 
 def ECMWF2DailyMaps(filelist, progress):
-    progress.setConsoleInfo("Computing daily maps...")
+    feedback.pushConsoleInfo("Computing daily maps...")
     # Get all days
     dates = []
     Tmax_Daily_FileList = []

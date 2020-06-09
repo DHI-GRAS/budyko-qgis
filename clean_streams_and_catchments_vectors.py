@@ -12,7 +12,7 @@ from processing.core.GeoAlgorithmExecutionException import GeoAlgorithmExecution
 streamLayer = dataobjects.getObjectFromUri(streamVector)
 catchmentLayer = dataobjects.getObjectFromUri(catchmentVector)
 
-progress.setText("Reading data...")
+feedback.setProgressText("Reading data...")
 linkno, s = streamLayer.getValues("LINKNO")
 if not s:
     raise GeoAlgorithmExecutionException("Stream vector is missing LINKNO field.")
@@ -39,13 +39,13 @@ allLinksNew = np.copy(allLinks)
 catchments = np.array([-1] + dn)
 catchmentsNew = np.copy(catchments)
 
-progress.setText("Cleaning data...")
+feedback.setProgressText("Cleaning data...")
 for i, value in enumerate(linkno):
     allLinksNew[allLinks == value] = i
     catchmentsNew[catchments == value] = i
 print(catchments)
 
-progress.setText("Saving stream data...")
+feedback.setProgressText("Saving stream data...")
 total = 100.0 / len(linkno) if len(linkno) > 0 else 1
 streamLayer.startEditing()
 streamLayer.selectAll()
@@ -57,9 +57,9 @@ for i, feature in enumerate(streamLayer.selectedFeaturesIterator()):
                                                      uslinkno2Id: int(allLinksNew[i, 3])}, {})
 streamLayer.removeSelection()
 if not streamLayer.commitChanges():
-    progress.setText(streamLayer.commitErrors())
+    feedback.setProgressText(streamLayer.commitErrors())
 
-progress.setText("Saving catchment data...")
+feedback.setProgressText("Saving catchment data...")
 total = 100.0 / len(linkno) if len(linkno) > 0 else 1
 catchmentLayer.startEditing()
 catchmentLayer.selectAll()
@@ -69,4 +69,4 @@ for i, feature in enumerate(catchmentLayer.selectedFeaturesIterator()):
 catchmentLayer.removeSelection()
 catchmentLayer.renameAttribute(dnId, "ID")
 if not catchmentLayer.commitChanges():
-    progress.setText(catchmentLayer.commitErrors())
+    feedback.setProgressText(catchmentLayer.commitErrors())

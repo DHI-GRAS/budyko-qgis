@@ -40,7 +40,7 @@ if os.path.isdir(dst_folder):
         # Download, extract and translate to GeoTIFF
         iteration = 0
         for year in range(start_date.year, end_date.year+1):
-            progress.setConsoleInfo("Downloading and extracting RFE precipitation data for " +
+            feedback.pushConsoleInfo("Downloading and extracting RFE precipitation data for " +
                                     str(year) + "...")
             if year == now.year:
                 if start_date < date(now.year, 1, 1):

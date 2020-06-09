@@ -26,7 +26,7 @@ class ProgressLogger:
         self.progress = progress
 
     def write(self, msg):
-        self.progress.setConsoleInfo(msg)
+        self.feedback.pushConsoleInfo(msg)
 
 
 @contextmanager

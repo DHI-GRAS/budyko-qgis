@@ -26,7 +26,7 @@ def RfeImportYear(year, TargetDirectory, log_file, progress, iteration, number_o
         rday = urllib.urlretrieve(UrlToRead, dst_file)
         progress.setPercentage(iteration/number_of_iterations*100)
         iteration += 1
-        progress.setConsoleInfo("Extracting data...")
+        feedback.pushConsoleInfo("Extracting data...")
         # Extract year
         tar = tarfile.open(dst_file)
         tar.extractall(DownloadDirectory)
@@ -120,7 +120,7 @@ def Rfe2GeoTIFF_WGS84(BIL_filelist, dst_folder, log_file, progress, iteration,
     """OBS: Files must be in WGS84 """
 
     iteration += 1
-    progress.setConsoleInfo("Translating to GeoTIFF...")
+    feedback.pushConsoleInfo("Translating to GeoTIFF...")
     for BIL_filename in BIL_filelist:
         filename = os.path.split(BIL_filename)[1].split('.bil')[0]
         file_date = date(int(filename[5:9]), 1, 1) + timedelta(days=int(filename[9:])-1)
@@ -137,7 +137,7 @@ def call_gdal_translate(in_filename, out_filename, newExtent, progress):
 
         ext = dataobjects.extent([in_filename])
         if ext == '0,0,0,0':
-            progress.setConsoleInfo("Cannot find downloaded raster extent! Not subsetting.")
+            feedback.pushConsoleInfo("Cannot find downloaded raster extent! Not subsetting.")
             return
         [xmin, xmax, ymin, ymax] = [float(i) for i in ext.split(",")]
 
@@ -147,7 +147,7 @@ def call_gdal_translate(in_filename, out_filename, newExtent, progress):
             try:
                 [nxmin, nxmax, nymin, nymax] = [float(i) for i in extents]
             except ValueError:
-                progress.setText('Invalid subset extent! Not subsetting.')
+                feedback.setProgressText('Invalid subset extent! Not subsetting.')
                 return
             xmin = max(nxmin, xmin)
             xmax = min(nxmax, xmax)
@@ -157,7 +157,7 @@ def call_gdal_translate(in_filename, out_filename, newExtent, progress):
         subset = str(xmin)+","+str(xmax)+","+str(ymin)+","+str(ymax)
 
         # call gdal_translateconvertformat
-        progress.setText('Processing '+out_filename)
+        feedback.setProgressText('Processing '+out_filename)
         print('Processing '+out_filename)
         param = {'INPUT': in_filename, 'OUTSIZE': 100, 'OUTSIZE_PERC': True, 'NO_DATA': "",
                  'EXPAND': 0, 'SRS': "EPSG:4326", 'PROJWIN': subset, 'SDS': False, 'RTYPE': 5,
@@ -166,4 +166,4 @@ def call_gdal_translate(in_filename, out_filename, newExtent, progress):
         processing.runalg('gdalogr:translate', param)
 
     except Exception as e:
-        progress.setConsoleInfo('Fail')
+        feedback.pushConsoleInfo('Fail')
