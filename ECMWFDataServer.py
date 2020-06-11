@@ -25,17 +25,21 @@ except:
 
 try:
     import socket
+
     socket.ssl
 except:
     print("Python socket module was not compiled with SSL support. Aborting...")
     sys.exit(1)
 
 from processing.core.ProcessingLog import ProcessingLog
+
+
 def print(string):
-    ProcessingLog.addToLog("ECMWF request: "+string, ProcessingLog.LOG_INFO)
+    ProcessingLog.addToLog("ECMWF request: " + string, ProcessingLog.LOG_INFO)
+
 
 ###############################################################################
-VERSION = '1.3'
+VERSION = "1.3"
 
 ###############################################################################
 
@@ -47,54 +51,62 @@ rc = os.path.normpath(os.path.expanduser("~/.ecmwfapirc"))
 if os.path.exists(rc):
     try:
         config = json.loads(file(rc).read())
-        URL   = config.get("url", "https://api.ecmwf.int/v1")
-        KEY   = config.get("key")
+        URL = config.get("url", "https://api.ecmwf.int/v1")
+        KEY = config.get("key")
         EMAIL = config.get("email")
     except Exception, e:
         print(str(e))
         sys.exit(1)
 
-KEY=os.environ.get("ECMWF_API_KEY", KEY)
-URL=os.environ.get("ECMWF_API_URL", URL)
-EMAIL=os.environ.get("ECMWF_API_EMAIL", EMAIL)
+KEY = os.environ.get("ECMWF_API_KEY", KEY)
+URL = os.environ.get("ECMWF_API_URL", URL)
+EMAIL = os.environ.get("ECMWF_API_EMAIL", EMAIL)
 
 ###############################################################################
 
+
 class RetryError(Exception):
     def __init__(self, code, text):
-       self.code = code
-       self.text = text
+        self.code = code
+        self.text = text
+
     def __str__(self):
         return "%d %s" % (self.code, self.text)
 
+
 class APIException(Exception):
     def __init__(self, value):
-       self.value = value
+        self.value = value
+
     def __str__(self):
         return repr(self.value)
 
-def robust(func):
 
-    def wrapped(*args,**kwargs):
+def robust(func):
+    def wrapped(*args, **kwargs):
         tries = 0
         while True:
             try:
-                return func(*args,**kwargs)
+                return func(*args, **kwargs)
             except urllib2.HTTPError, e:
                 print("WARNING: httplib2.HTTPError received %s" % (e))
-                if e.code < 500: raise
+                if e.code < 500:
+                    raise
                 tries += 1
-                if tries > 10: raise
+                if tries > 10:
+                    raise
                 time.sleep(60)
             except httplib.BadStatusLine, e:
                 print("WARNING: httplib.BadStatusLine received %s" % (e))
                 tries += 1
-                if tries > 10: raise
+                if tries > 10:
+                    raise
                 time.sleep(60)
             except urllib2.URLError, e:
                 print("WARNING: httplib2.URLError received %s %s" % (e.errno, e))
                 tries += 1
-                if tries > 10: raise
+                if tries > 10:
+                    raise
                 time.sleep(60)
             except APIException:
                 raise
@@ -102,7 +114,8 @@ def robust(func):
                 print("WARNING: HTTP received %s" % (e.code))
                 print(e.text)
                 tries += 1
-                if tries > 10: raise
+                if tries > 10:
+                    raise
                 time.sleep(60)
             except:
                 print("Unexpected error: %s" % sys.exc_info()[0])
@@ -111,10 +124,11 @@ def robust(func):
 
     return wrapped
 
+
 SAY = True
+
+
 class Ignore303(urllib2.HTTPRedirectHandler):
-
-
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         if code in [301, 302]:
             # We want the posts to work even if we are redirected
@@ -136,8 +150,13 @@ class Ignore303(urllib2.HTTPRedirectHandler):
             data = None
             if req.has_data():
                 data = req.get_data()
-            return urllib2.Request(newurl, data=data, headers = req.headers,
-                                    origin_req_host=req.get_origin_req_host(), unverifiable=True)
+            return urllib2.Request(
+                newurl,
+                data=data,
+                headers=req.headers,
+                origin_req_host=req.get_origin_req_host(),
+                unverifiable=True,
+            )
         return None
 
     def http_error_303(self, req, fp, code, msg, headers):
@@ -146,35 +165,39 @@ class Ignore303(urllib2.HTTPRedirectHandler):
         infourl.code = code
         return infourl
 
-class Connection(object):
 
-    def __init__(self, email = None, key = None, verbose = False, quiet = True):
-        self.email    = email
-        self.key      = key
-        self.retry    = 5
+class Connection(object):
+    def __init__(self, email=None, key=None, verbose=False, quiet=True):
+        self.email = email
+        self.key = key
+        self.retry = 5
         self.location = None
-        self.done     = False
-        self.value    = True
-        self.offset   = 0
-        self.verbose  = verbose
-        self.quiet    = quiet
-        self.status   = None
+        self.done = False
+        self.value = True
+        self.offset = 0
+        self.verbose = verbose
+        self.quiet = quiet
+        self.status = None
 
     @robust
-    def call(self, url, payload = None, method = "GET"):
+    def call(self, url, payload=None, method="GET"):
 
         if self.verbose:
             print(method, url)
 
-        headers = { "Accept" : "application/json", "From" : self.email, "X-ECMWF-KEY" : self.key }
+        headers = {
+            "Accept": "application/json",
+            "From": self.email,
+            "X-ECMWF-KEY": self.key,
+        }
 
         opener = urllib2.build_opener(Ignore303)
 
         data = None
         if payload is not None:
             data = json.dumps(payload)
-            data.encode('utf-8')
-            headers["Content-Type"] = "application/json";
+            data.encode("utf-8")
+            headers["Content-Type"] = "application/json"
 
         url = "%s?offset=%d&limit=500" % (url, self.offset)
         req = urllib2.Request(url=url, data=data, headers=headers)
@@ -184,26 +207,26 @@ class Connection(object):
         error = False
         try:
             try:
-                res  = opener.open(req)
-            except urllib2.HTTPError,e:
+                res = opener.open(req)
+            except urllib2.HTTPError, e:
                 # It seems that some version of urllib2 are buggy
                 if e.code <= 299:
                     res = e
                 else:
                     raise
-        except urllib2.HTTPError,e:
+        except urllib2.HTTPError, e:
             print(str(e))
             error = True
-            res   = e
+            res = e
             # 502: Proxy Error
             # 503: Service Temporarily Unavailable
             if e.code >= 500:
                 raise RetryError(e.code, e.read())
 
-        self.retry    = int(res.headers.get("Retry-After", self.retry))
-        code          = res.code
+        self.retry = int(res.headers.get("Retry-After", self.retry))
+        code = res.code
         if code in [201, 202]:
-            self.location = res.headers.get("Location",    self.location)
+            self.location = res.headers.get("Location", self.location)
 
         if self.verbose:
             print("Code", code)
@@ -214,19 +237,18 @@ class Connection(object):
         body = res.read()
         res.close()
 
-
         if code in [204]:
             self.last = None
             return None
         else:
             try:
-                self.last  =  json.loads(body)
+                self.last = json.loads(body)
             except Exception, e:
-                self.last = { "error" : "%s: %s" % (e, body) }
+                self.last = {"error": "%s: %s" % (e, body)}
                 error = True
 
         if self.verbose:
-            print(json.dumps(self.last,indent=4))
+            print(json.dumps(self.last, indent=4))
 
         self.status = self.last.get("status", self.status)
 
@@ -241,21 +263,21 @@ class Connection(object):
 
         if code == 200 and self.status == "complete":
             self.value = self.last
-            self.done  = True
+            self.done = True
             if isinstance(self.value, dict) and "result" in self.value:
                 self.value = self.value["result"]
 
         if code in [303]:
             self.value = self.last
-            self.done  = True
+            self.done = True
 
         if "error" in self.last:
-            #self.done   = True
-            raise APIException("ecmwf.API error 1: %s" % (self.last["error"],) )
+            # self.done   = True
+            raise APIException("ecmwf.API error 1: %s" % (self.last["error"],))
 
         if error:
-            #self.done   = True
-            raise APIException("ecmwf.API error 2: %s" % (res, ) )
+            # self.done   = True
+            raise APIException("ecmwf.API error 2: %s" % (res,))
 
         return self.last
 
@@ -280,7 +302,6 @@ class Connection(object):
     def result(self):
         return self.value
 
-
     def cleanup(self):
         try:
             if self.location:
@@ -288,59 +309,72 @@ class Connection(object):
         except:
             pass
 
+
 def no_log(msg):
     pass
 
-class Request(object):
 
-    def __init__(self, url, service, email  = None, key  = None, log = no_log, quiet = True, verbose = False, news = True):
-        self.url        = url
-        self.service    = service
-        self.connection = Connection(email, key, quiet = quiet, verbose = verbose)
-        self.log        = log
-        self.quiet      = quiet
+class Request(object):
+    def __init__(
+        self,
+        url,
+        service,
+        email=None,
+        key=None,
+        log=no_log,
+        quiet=True,
+        verbose=False,
+        news=True,
+    ):
+        self.url = url
+        self.service = service
+        self.connection = Connection(email, key, quiet=quiet, verbose=verbose)
+        self.log = log
+        self.quiet = quiet
         self.log("ECMWF API python library %s" % (VERSION,))
         self.log("ECMWF API at %s" % (self.url,))
         user = self.connection.call("%s/%s" % (self.url, "who-am-i"))
         self.log("Welcome %s" % (user["full_name"] or "user '%s'" % user["uid"],))
         if news:
             try:
-                news = self.connection.call("%s/%s/%s" % (self.url, self.service, "news"))
+                news = self.connection.call(
+                    "%s/%s/%s" % (self.url, self.service, "news")
+                )
                 for n in news["news"].split("\n"):
                     self.log(n)
             except:
                 pass
 
-    def _bytename(self,size):
-        prefix = {'':'K','K':'M','M':'G','G':'T','T':'P','P':'E'}
-        l    = ''
-        size = size*1.0
+    def _bytename(self, size):
+        prefix = {"": "K", "K": "M", "M": "G", "G": "T", "T": "P", "P": "E"}
+        l = ""
+        size = size * 1.0
         while 1024 < size:
             l = prefix[l]
             size = size / 1024
         s = ""
         if size > 1:
             s = "s"
-        return "%g %sbyte%s" % (size,l,s)
+        return "%g %sbyte%s" % (size, l, s)
 
     @robust
     def _transfer(self, url, path, size):
         self.log("Transfering %s into %s" % (self._bytename(size), path))
-        self.log("From %s" % (url, ))
+        self.log("From %s" % (url,))
         start = time.time()
         http = urllib2.urlopen(url)
-        f = open(path,"wb")
+        f = open(path, "wb")
         total = 0
-        block = 1024*1024
+        block = 1024 * 1024
         while True:
             chunk = http.read(block)
-            if not chunk: break
+            if not chunk:
+                break
             f.write(chunk)
             total += len(chunk)
         f.flush()
         f.close()
         end = time.time()
-
 
         header = http.info()
         assert total == size
@@ -351,29 +385,28 @@ class Request(object):
             assert total == long(length)
 
         if end > start:
-           self.log("Transfer rate %s/s" % self._bytename(total / ( end - start)), )
+            self.log("Transfer rate %s/s" % self._bytename(total / (end - start)),)
 
         return total
 
-
-    def execute(self, request, target = None):
+    def execute(self, request, target=None):
 
         status = None
 
         self.connection.submit("%s/%s/requests" % (self.url, self.service), request)
         if self.connection.status != status:
             status = self.connection.status
-            self.log("Request is %s" % (status, ))
+            self.log("Request is %s" % (status,))
 
         while not self.connection.ready():
             if self.connection.status != status:
                 status = self.connection.status
-                self.log("Request is %s" % (status, ))
+                self.log("Request is %s" % (status,))
             self.connection.wait()
 
         if self.connection.status != status:
             status = self.connection.status
-            self.log("Request is %s" % (status, ))
+            self.log("Request is %s" % (status,))
 
         result = self.connection.result()
         if target:
@@ -397,53 +430,77 @@ class Request(object):
 
 ###############################################################################
 
-class ECMWFDataServer(object):
 
-    def __init__(self, url = URL, key = KEY, email = EMAIL, verbose = False, log = None):
-        self.url     = url
-        self.key     = key
-        self.email   = email
+class ECMWFDataServer(object):
+    def __init__(self, url=URL, key=KEY, email=EMAIL, verbose=False, log=None):
+        self.url = url
+        self.key = key
+        self.email = email
         self.verbose = verbose
-        self.log     = log
+        self.log = log
 
     def trace(self, m):
         if self.log:
             self.log(m)
         else:
             t = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-            print("%s %s" % (t,m,))
+            print("%s %s" % (t, m,))
 
     def retrieve(self, req):
-        target  = req.get("target")
+        target = req.get("target")
         dataset = req.get("dataset")
-        c = Request(self.url, "datasets/%s" % (dataset,), self.email, self.key, self.trace, verbose = self.verbose)
+        c = Request(
+            self.url,
+            "datasets/%s" % (dataset,),
+            self.email,
+            self.key,
+            self.trace,
+            verbose=self.verbose,
+        )
         c.execute(req, target)
+
 
 ###############################################################################
 
-class ECMWFService(object):
 
-    def __init__(self, service, url = URL, key = KEY, email = EMAIL, verbose = False, log = None, quiet = True):
+class ECMWFService(object):
+    def __init__(
+        self,
+        service,
+        url=URL,
+        key=KEY,
+        email=EMAIL,
+        verbose=False,
+        log=None,
+        quiet=True,
+    ):
         self.service = service
-        self.url     = url
-        self.key     = key
-        self.email   = email
+        self.url = url
+        self.key = key
+        self.email = email
         self.verbose = verbose
-        self.quiet   = quiet
-        self.log     = log
+        self.quiet = quiet
+        self.log = log
 
     def trace(self, m):
         if self.log:
             self.log(m)
         else:
             t = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-            print("%s %s" % (t,m,))
+            print("%s %s" % (t, m,))
 
     def execute(self, req, target):
-        c = Request(self.url, "services/%s" % (self.service,), self.email, self.key, self.trace, verbose = self.verbose, quiet = self.quiet)
+        c = Request(
+            self.url,
+            "services/%s" % (self.service,),
+            self.email,
+            self.key,
+            self.trace,
+            verbose=self.verbose,
+            quiet=self.quiet,
+        )
         c.execute(req, target)
         self.trace("Done.")
 
+
 ###############################################################################
-
-

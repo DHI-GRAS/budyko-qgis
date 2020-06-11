@@ -15,7 +15,6 @@ from budyko_model.modelfile import ModelFile
 
 
 class ProgressLogger:
-
     def __init__(self, progress):
         self.progress = progress
 
@@ -43,8 +42,10 @@ with redirect_stdout(progress):
 
     temp_file = getTempFilename("csv")
     geometry_file_creation.read_network_file(model, routing, temp_file)
-    subreaches = pd.read_csv(temp_file, index_col='Subbasin')
-    geometry_file_creation.write_geometry_file(subreaches=subreaches,
-                                               model=model,
-                                               drains_to=drains_to,
-                                               geometry_file=GEOMETRY_FILE)
+    subreaches = pd.read_csv(temp_file, index_col="Subbasin")
+    geometry_file_creation.write_geometry_file(
+        subreaches=subreaches,
+        model=model,
+        drains_to=drains_to,
+        geometry_file=GEOMETRY_FILE,
+    )

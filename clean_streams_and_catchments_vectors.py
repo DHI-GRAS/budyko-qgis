@@ -1,5 +1,5 @@
-#Definition of inputs and outputs
-#==================================
+# Definition of inputs and outputs
+# ==================================
 ##Budyko=group
 ##Clean-up stream and catchment vectors=name
 ##ParameterVector|streamVector|Stream Vector|1|False
@@ -51,10 +51,16 @@ streamLayer.startEditing()
 streamLayer.selectAll()
 for i, feature in enumerate(streamLayer.selectedFeaturesIterator()):
     progress.setPercentage(int(i * total))
-    streamLayer.changeAttributeValues(feature.id(), {linknoId: int(allLinksNew[i, 0]),
-                                                     dslinknoId: int(allLinksNew[i, 1]),
-                                                     uslinkno1Id: int(allLinksNew[i, 2]),
-                                                     uslinkno2Id: int(allLinksNew[i, 3])}, {})
+    streamLayer.changeAttributeValues(
+        feature.id(),
+        {
+            linknoId: int(allLinksNew[i, 0]),
+            dslinknoId: int(allLinksNew[i, 1]),
+            uslinkno1Id: int(allLinksNew[i, 2]),
+            uslinkno2Id: int(allLinksNew[i, 3]),
+        },
+        {},
+    )
 streamLayer.removeSelection()
 if not streamLayer.commitChanges():
     feedback.setProgressText(streamLayer.commitErrors())
@@ -65,7 +71,9 @@ catchmentLayer.startEditing()
 catchmentLayer.selectAll()
 for i, feature in enumerate(catchmentLayer.selectedFeaturesIterator()):
     progress.setPercentage(int(i * total))
-    catchmentLayer.changeAttributeValues(feature.id(), {dnId: int(catchmentsNew[i+1])}, {})
+    catchmentLayer.changeAttributeValues(
+        feature.id(), {dnId: int(catchmentsNew[i + 1])}, {}
+    )
 catchmentLayer.removeSelection()
 catchmentLayer.renameAttribute(dnId, "ID")
 if not catchmentLayer.commitChanges():
