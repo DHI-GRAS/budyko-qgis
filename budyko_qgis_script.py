@@ -19,7 +19,6 @@ from budyko_model.scripts import middle_layer
 
 
 class ProgressLogger:
-
     def __init__(self, progress):
         self.progress = progress
 
@@ -37,8 +36,8 @@ def redirect_stdout(progress):
         sys.stdout = oldout
 
 
-time_resolution = ['daily', 'monthly'][TIME_RESOLUTION_ID]
-model_type = ['hydrograph', 'climatology', 'fdc'][MODEL_TYPE_ID]
+time_resolution = ["daily", "monthly"][TIME_RESOLUTION_ID]
+model_type = ["hydrograph", "climatology", "fdc"][MODEL_TYPE_ID]
 
 with redirect_stdout(progress):
     middle_layer.main(
@@ -54,4 +53,5 @@ with redirect_stdout(progress):
         n_classes=N_CLASSES,
         area_to_m=AREA_TO_M,
         figure_title=FIGURE_TITLE,
-        show_figure=True)
+        show_figure=True,
+    )

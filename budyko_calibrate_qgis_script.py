@@ -21,7 +21,6 @@ from budyko_model.scripts import middle_layer_calibration
 
 
 class ProgressLogger:
-
     def __init__(self, progress):
         self.progress = progress
 
@@ -43,12 +42,12 @@ def _key_to_int(kw):
     for k, v in kw.items():
         if isinstance(v, dict):
             _key_to_int(v)
-        elif re.match('\d+', k) is not None:
+        elif re.match("\d+", k) is not None:
             kw[int(k)] = kw.pop(k)
 
 
 def _read_json_config(path):
-    with open(path, 'r') as f:
+    with open(path, "r") as f:
         kw = json.load(f)
     _key_to_int(kw)
     return kw
@@ -56,7 +55,7 @@ def _read_json_config(path):
 
 config_kw = _read_json_config(CONFIG_FILE)
 
-calibration_type = ['fdc', 'climatology', 'both'][CALIBRATION_TYPE_ID]
+calibration_type = ["fdc", "climatology", "both"][CALIBRATION_TYPE_ID]
 
 with redirect_stdout(progress):
     middle_layer_calibration.main(

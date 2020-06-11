@@ -11,35 +11,61 @@
 import os
 import sys
 from datetime import datetime
-from processing.core.GeoAlgorithmExecutionException import GeoAlgorithmExecutionException
+from processing.core.GeoAlgorithmExecutionException import (
+    GeoAlgorithmExecutionException,
+)
+
 if not os.path.dirname(scriptDescriptionFile) in sys.path:
     sys.path.append(os.path.dirname(scriptDescriptionFile))
 import DownloadECMWFClimateData
 
-[left_long, right_long, bottom_lat, top_lat] = [float(i) for i in subset_extent.split(",")]
+[left_long, right_long, bottom_lat, top_lat] = [
+    float(i) for i in subset_extent.split(",")
+]
 
 # Check coordinates
 if (left_long >= right_long) or (bottom_lat >= top_lat):
-    raise GeoAlgorithmExecutionException('Error in coordinates: \"Left :' + str(left_long) +
-    '< Right: ' + str(right_long) + ', Top :' + str(top_lat) + '> Bottom :' + str(bottom_lat) + '\"')
+    raise GeoAlgorithmExecutionException(
+        'Error in coordinates: "Left :'
+        + str(left_long)
+        + "< Right: "
+        + str(right_long)
+        + ", Top :"
+        + str(top_lat)
+        + "> Bottom :"
+        + str(bottom_lat)
+        + '"'
+    )
 
 # Get dates
 try:
     start_date = datetime.strptime(start_date, "%Y%m%d").date()
 except ValueError:
-    raise GeoAlgorithmExecutionException('Error in data format: \"' + start_date +
-                                         '\". Must be in YYYYMMDD.')
+    raise GeoAlgorithmExecutionException(
+        'Error in data format: "' + start_date + '". Must be in YYYYMMDD.'
+    )
 
 try:
     end_date = datetime.strptime(end_date, "%Y%m%d").date()
 except ValueError:
-    raise GeoAlgorithmExecutionException('Error in data format: ' + end_date +
-                                         '\". Must be in YYYYMMDD.')
+    raise GeoAlgorithmExecutionException(
+        "Error in data format: " + end_date + '". Must be in YYYYMMDD.'
+    )
 
 if os.path.isdir(tmax_dst_folder) and os.path.isdir(tmin_dst_folder):
     # Download, extract and translate to GeoTIFF
-    DownloadECMWFClimateData.ECMWFImport(email, token, start_date, end_date, tmax_dst_folder,
-                                         tmin_dst_folder, left_long, right_long, top_lat,
-                                         bottom_lat, progress)
+    DownloadECMWFClimateData.ECMWFImport(
+        email,
+        token,
+        start_date,
+        end_date,
+        tmax_dst_folder,
+        tmin_dst_folder,
+        left_long,
+        right_long,
+        top_lat,
+        bottom_lat,
+        progress,
+    )
 else:
-    raise GeoAlgorithmExecutionException('No such directory: \"' + dst_folder + '\" ')
+    raise GeoAlgorithmExecutionException('No such directory: "' + dst_folder + '" ')
