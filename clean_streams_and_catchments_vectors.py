@@ -7,7 +7,7 @@
 
 import numpy as np
 from processing.tools import dataobjects
-from processing.core.GeoAlgorithmExecutionException import GeoAlgorithmExecutionException
+from qgis.core import QgsProcessingException
 
 streamLayer = dataobjects.getObjectFromUri(streamVector)
 catchmentLayer = dataobjects.getObjectFromUri(catchmentVector)
@@ -15,23 +15,23 @@ catchmentLayer = dataobjects.getObjectFromUri(catchmentVector)
 feedback.setProgressText("Reading data...")
 linkno, s = streamLayer.getValues("LINKNO")
 if not s:
-    raise GeoAlgorithmExecutionException("Stream vector is missing LINKNO field.")
+    raise QgsProcessingException("Stream vector is missing LINKNO field.")
 linknoId = streamLayer.fieldNameIndex("LINKNO")
 dslinkno, s = streamLayer.getValues("DSLINKNO")
 if not s:
-    raise GeoAlgorithmExecutionException("Stream vector is missing DSLINKNO field.")
+    raise QgsProcessingException("Stream vector is missing DSLINKNO field.")
 dslinknoId = streamLayer.fieldNameIndex("DSLINKNO")
 uslinkno1, s = streamLayer.getValues("USLINKNO1")
 if not s:
-    raise GeoAlgorithmExecutionException("Stream vector is missing USLINKNO1 field.")
+    raise QgsProcessingException("Stream vector is missing USLINKNO1 field.")
 uslinkno1Id = streamLayer.fieldNameIndex("USLINKNO1")
 uslinkno2, s = streamLayer.getValues("USLINKNO2")
 if not s:
-    raise GeoAlgorithmExecutionException("Stream vector is missing USLINKNO2 field.")
+    raise QgsProcessingException("Stream vector is missing USLINKNO2 field.")
 uslinkno2Id = streamLayer.fieldNameIndex("USLINKNO2")
 dn, s = catchmentLayer.getValues("DN")
 if not s:
-    raise GeoAlgorithmExecutionException("Catchment vector is missing DN field.")
+    raise QgsProcessingException("Catchment vector is missing DN field.")
 dnId = catchmentLayer.fieldNameIndex("DN")
 
 allLinks = np.array(zip(linkno, dslinkno, uslinkno1, uslinkno2))

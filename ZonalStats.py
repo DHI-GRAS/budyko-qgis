@@ -1,7 +1,7 @@
 import os
 from datetime import date, timedelta
 import processing
-from processing.core.GeoAlgorithmExecutionException import GeoAlgorithmExecutionException
+from qgis.core import QgsProcessingException
 from processing.tools import dataobjects, system
 import numpy as np
 
@@ -10,9 +10,9 @@ def ZonalStats(start_date, end_date, vec_name, sb_column, file_list, subcatchmap
                corr_by_num=None, corr_by_fact=None, progress = None):
 
     if not os.path.isfile(vec_name):
-        raise GeoAlgorithmExecutionException('No shapefile: \"' + vec_name + '\" ')
+        raise QgsProcessingException('No shapefile: \"' + vec_name + '\" ')
     if not file_list:
-        raise GeoAlgorithmExecutionException('List of files is empty')
+        raise QgsProcessingException('List of files is empty')
 
     # Creating a list of dates (year + julian day)
     dates = []

@@ -8,7 +8,7 @@
 import os
 import sys
 from datetime import date, datetime
-from processing.core.GeoAlgorithmExecutionException import GeoAlgorithmExecutionException
+from qgis.core import QgsProcessingException
 if not os.path.dirname(scriptDescriptionFile) in sys.path:
     sys.path.append(os.path.dirname(scriptDescriptionFile))
 import DownloadRfeClimateData
@@ -26,13 +26,13 @@ if os.path.isdir(dst_folder):
         try:
             start_date = datetime.strptime(start_date, "%Y%m%d").date()
         except ValueError:
-            raise GeoAlgorithmExecutionException('Error in data format: \"' + start_date +
+            raise QgsProcessingException('Error in data format: \"' + start_date +
                                                  '\". Must be in YYYYMMDD.')
 
         try:
             end_date = datetime.strptime(end_date, "%Y%m%d").date()
         except ValueError:
-            raise GeoAlgorithmExecutionException('Error in data format: ' + end_date +
+            raise QgsProcessingException('Error in data format: ' + end_date +
                                                  '\". Must be in YYYYMMDD.')
 
         number_of_iterations = float((end_date.year - start_date.year + 1)*3)
@@ -61,4 +61,4 @@ if os.path.isdir(dst_folder):
                                                                  number_of_iterations,
                                                                  subset_extent)
 else:
-    raise GeoAlgorithmExecutionException('No such directory: \"' + dst_folder + '\" ')
+    raise QgsProcessingException('No such directory: \"' + dst_folder + '\" ')

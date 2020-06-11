@@ -10,7 +10,7 @@ import os
 import sys
 from datetime import date, timedelta, datetime
 import numpy
-from processing.core.GeoAlgorithmExecutionException import GeoAlgorithmExecutionException
+from qgis.core import QgsProcessingException
 from budyko_model.modelfile import ModelFile
 if not os.path.dirname(scriptDescriptionFile) in sys.path:
     sys.path.append(os.path.dirname(scriptDescriptionFile))
@@ -22,9 +22,9 @@ feedback.pushConsoleInfo("Loading model and data files...")
 # Check inputs
 for folder in [pcp_folder, tmax_folder, tmin_folder]:
     if not os.path.isdir(folder):
-        raise GeoAlgorithmExecutionException('No such directory: \"' + folder + '\" ')
+        raise QgsProcessingException('No such directory: \"' + folder + '\" ')
 if not os.path.isfile(model_file):
-    raise GeoAlgorithmExecutionException('No such file: \"' + model_file + '\" ')
+    raise QgsProcessingException('No such file: \"' + model_file + '\" ')
 
 # Load model
 model = ModelFile(model_file)

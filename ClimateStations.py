@@ -2,7 +2,7 @@ from datetime import date, timedelta
 import datetime
 import os
 import numpy
-from processing.core.GeoAlgorithmExecutionException import GeoAlgorithmExecutionException
+from qgis.core import QgsProcessingException
 
 
 class ClimateStations():
@@ -32,7 +32,7 @@ class ClimateStations():
             for i in self.station_id:
                 self.station_id_dict[int(i)] = i
         else:
-            raise GeoAlgorithmExecutionException('No such file: \"' + stations_filename + '\" ')
+            raise QgsProcessingException('No such file: \"' + stations_filename + '\" ')
 
     def readPcpFiles(self, log_file):
         """Reading the Budyko .pcp files for all stations in station file"""
@@ -72,7 +72,7 @@ class ClimateStations():
                             if n > 0:
                                 pcp_array[n-1, i-1] = float(lines[n])
             else:
-                raise GeoAlgorithmExecutionException('No pcp file found: \"' +
+                raise QgsProcessingException('No pcp file found: \"' +
                                                      station_pcp_filename + '\" ')
 
         if pcp_dates:
@@ -139,7 +139,7 @@ class ClimateStations():
                             tmp_max_array[n-1, i-1] = float(lines[n][0:5])
                             tmp_min_array[n-1, i-1] = float(lines[n][6:13])
             else:
-                raise GeoAlgorithmExecutionException('No tmp file found: \"' +
+                raise QgsProcessingException('No tmp file found: \"' +
                                                      station_tmp_filename + '\" ')
 
         if tmp_dates:
@@ -179,7 +179,7 @@ class ClimateStations():
                         f.write(("%.1f" % pcp_array[l, i-1]))
                         f.write('\n')
             else:
-                raise GeoAlgorithmExecutionException('No .pcp file found:: \"' +
+                raise QgsProcessingException('No .pcp file found:: \"' +
                                                      station_pcp_filename + '\" ')
 
     def writeTmpFiles(self, first_tmp_date, tmp_max_array, tmp_min_array, log_file):
@@ -203,5 +203,5 @@ class ClimateStations():
                         f.write(("%05.1f" % tmp_min_array[l, i-1]))
                         f.write('\n')
             else:
-                raise GeoAlgorithmExecutionException('No .tmp file found: \"' +
+                raise QgsProcessingException('No .tmp file found: \"' +
                                                      station_tmp_filename + '\" ')
